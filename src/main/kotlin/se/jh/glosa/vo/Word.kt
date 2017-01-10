@@ -89,29 +89,11 @@ data class Word(val foreignWord: String, val localWord: String) : IWord {
         }
     }
 
-    override fun getNoOfCorrect(inverse: Boolean): Int {
-        if (!inverse) {
-            return noOfCorrect
-        } else {
-            return noOfCorrectInverse
-        }
-    }
+    override fun getNoOfCorrect(inverse: Boolean) = if (!inverse) noOfCorrect else noOfCorrectInverse
 
-    override fun getNoOfUsedHist(inverse: Boolean): Int {
-        if (!inverse) {
-            return noOfUsedHist
-        } else {
-            return noOfUsedHistInverse
-        }
-    }
+    override fun getNoOfUsedHist(inverse: Boolean) = if (!inverse) noOfUsedHist else noOfUsedHistInverse
 
-    override fun getNoOfUsedSession(inverse: Boolean): Int {
-        if (!inverse) {
-            return noOfUsedSession
-        } else {
-            return noOfUsedSessionInverse
-        }
-    }
+    override fun getNoOfUsedSession(inverse: Boolean) = if (!inverse) noOfUsedSession else noOfUsedSessionInverse
 
     private fun getAnswerAlternatives(answer: String): List<String> {
         val returnList = ArrayList<String>()

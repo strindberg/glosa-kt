@@ -31,7 +31,7 @@ class WordFileReader(private val fileName: String) {
                 var inLine = historyIn.readLine()
                 while (inLine != null) {
                     val lineParts = inLine.split(HISTORY_SEPARATOR).toTypedArray()
-                    historyMap.put(lineParts[0].trim(), lineParts.slice(1..lineParts.size))
+                    historyMap.put(lineParts[0].trim(), lineParts.slice(1..(lineParts.size - 1)))
                     inLine = historyIn.readLine()
                 }
                 return historyMap
