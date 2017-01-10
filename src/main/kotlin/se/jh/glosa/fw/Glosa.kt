@@ -1,31 +1,42 @@
 package se.jh.glosa.fw
 
 import se.jh.glosa.txtui.TextController
+import se.jh.glosa.vo.IWord
 
-class Glosa {
+
+class Glosa(fileName: String) {
+
+    private val fileReader: WordFileReader = WordFileReader(fileName)
+
+    val words: List<IWord> = fileReader.words
+
+    fun quit(save: Boolean) {
+        if (save) {
+            fileReader.saveHistory(words)
+        }
+        System.exit(0)
+    }
+
 }
 
 fun main(args: Array<String>) {
-    println("Hello, world!")
-
     var inverse = false
     var oneShot = false
     var fileName: String? = null
 
     for (arg in args) {
-        if (arg.equals("-i")) {
+        if (arg == "-i") {
             inverse = true
-        } else if (arg.equals("-o")) {
+        } else if (arg == "-o") {
             oneShot = true
         } else {
             fileName = arg
         }
     }
 
-    val glosa = Glosa()
-
     if (fileName != null) {
-        val controller = TextController(glosa, fileName, inverse)
+        val glosa = Glosa(fileName)
+        val controller = TextController(glosa, inverse)
         controller.go(oneShot)
     } else {
         println("Usage: glosa <-i> <-o> [ordfil]")

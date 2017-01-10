@@ -3,6 +3,12 @@ apply plugin: "application"
 
 mainClassName = "se.jh.glosa.fw.GlosaKt"
 
+// jar {
+//     manifest {
+//         attributes("Main-Class": )
+//     }
+// }
+
 repositories {
     mavenCentral()
 }
@@ -15,7 +21,7 @@ dependencies {
 }
 
 buildscript {
-    ext.kotlin_version = '1.0.5-2'
+    ext.kotlin_version = '1.0.6'
 
     repositories {
         mavenCentral()

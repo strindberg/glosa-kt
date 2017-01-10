@@ -1,17 +1,9 @@
 package se.jh.glosa.vo
 
 import java.io.PrintStream
-import java.io.IOException
-import java.io.BufferedReader
-import java.io.Writer
-
 
 interface IWord {
-    @Throws(IOException::class)
-    fun writeToHistoryWriter(writer: Writer)
-
-    @Throws(IOException::class)
-    fun readFromReader(reader: BufferedReader, lineCount: Int, historyMap: Map<String, IWordHistory>): Int
+    fun provideHistoryLine(): String
 
     fun printQuestion(out: PrintStream, inverse: Boolean): Int
 
@@ -23,8 +15,12 @@ interface IWord {
 
     fun isCorrect(answer: String, inverse: Boolean): Boolean
 
-    fun getNoOfUsed(inverse: Boolean): Int
+    fun getNoOfUsedHist(inverse: Boolean): Int
+
+    fun getNoOfUsedSession(inverse: Boolean): Int
 
     fun getNoOfCorrect(inverse: Boolean): Int
+
+    fun initHistory(history: List<String>?)
 
 }
