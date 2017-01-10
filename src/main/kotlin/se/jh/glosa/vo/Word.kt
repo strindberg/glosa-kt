@@ -23,15 +23,9 @@ data class Word(val foreignWord: String, val localWord: String) : IWord {
 
     private var noOfCorrectInverse = 0
 
-    override fun printQuestion(out: PrintStream, inverse: Boolean): Int {
+    override fun printQuestion(out: PrintStream, inverse: Boolean, width: Int) {
         increaseUse(inverse)
-        if (!inverse) {
-            out.print(localWord)
-            return localWord.length
-        } else {
-            out.print(foreignWord)
-            return foreignWord.length
-        }
+        out.print("%-${width}s".format(if (!inverse) localWord else foreignWord))
     }
 
     override fun getQuestion(inverse: Boolean): String {
@@ -39,29 +33,20 @@ data class Word(val foreignWord: String, val localWord: String) : IWord {
         return if (!inverse) localWord else foreignWord
     }
 
-    override fun printAnswer(out: PrintStream, inverse: Boolean): Int {
-        if (!inverse) {
-            out.print(foreignWord)
-            return foreignWord.length
-        } else {
-            out.print(localWord)
-            return localWord.length
-        }
+    override fun printAnswer(out: PrintStream, inverse: Boolean, width: Int) {
+        out.print("%-${width}s".format(if (!inverse) foreignWord else localWord))
     }
 
     override fun getAnswer(inverse: Boolean): String = if (!inverse) foreignWord else localWord
 
     override fun isCorrect(answer: String, inverse: Boolean): Boolean {
-        if (!inverse) {
-            if (foreignAlternatives.contains(answer.trim())) {
-                increaseCorrect(inverse)
-                return true
-            }
-        } else {
-            if (localAlternatives.contains(answer.trim())) {
-                increaseCorrect(inverse)
-                return true
-            }
+        if (!inverse && foreignAlternatives.contains(answer.trim())) {
+            increaseCorrect(inverse)
+            return true
+        }
+        if (inverse && localAlternatives.contains(answer.trim())) {
+            increaseCorrect(inverse)
+            return true
         }
         return false
     }
@@ -98,7 +83,7 @@ data class Word(val foreignWord: String, val localWord: String) : IWord {
         for (i in alternatives.indices) {
             val alternative = alternatives[i]
             if (alternative.contains("[")) {
-                // TODO: check this logic
+                // TODO: check this logic. Simplify regexps?
                 // Remove brackets (but not what's inside the brackets)
                 val optional = alternative.replace("\\[".toRegex(), "").replace("\\]".toRegex(), "")
                 val p = Pattern.compile("\\[.*\\]")

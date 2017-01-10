@@ -22,10 +22,10 @@ class WordFileReader(private val fileName: String) {
 
     private fun historyFileName() = fileName.substring(0, fileName.lastIndexOf(".")) + HISTORY_FILE_SUFFIX
 
-    private fun fillHistoryMap(historyFileName: String): Map<String, List<String>>? {
+    private fun fillHistoryMap(historyFileName: String): Map<String, List<String>> {
+        val historyMap: MutableMap<String, List<String>> = HashMap()
         val historyFile = File(historyFileName)
         if (historyFile.exists()) {
-            val historyMap: MutableMap<String, List<String>> = HashMap()
             BufferedReader(FileReader(historyFile)).use { historyIn ->
                 historyIn.readLine() // History version line
                 var inLine = historyIn.readLine()
@@ -37,10 +37,10 @@ class WordFileReader(private val fileName: String) {
                 return historyMap
             }
         }
-        return null
+        return historyMap
     }
 
-    private fun readWords(historyMap: Map<String, List<String>>?): List<IWord> {
+    private fun readWords(historyMap: Map<String, List<String>>): List<IWord> {
         BufferedReader(FileReader(fileName)).use { reader ->
             val returnWords = ArrayList<IWord>()
             var readLine = reader.readLine()
@@ -54,7 +54,7 @@ class WordFileReader(private val fileName: String) {
                     val words = readLine.split(SEPARATOR)
                     val word = Word(words[0].trim(), words[1].trim())
 
-                    word.initHistory(historyMap?.get(readLine.trim()))
+                    word.initHistory(historyMap.get(readLine.trim()))
                     returnWords.add(word)
                 }
                 readLine = reader.readLine()

@@ -5,11 +5,11 @@ import java.io.PrintStream
 interface IWord {
     fun provideHistoryLine(): String
 
-    fun printQuestion(out: PrintStream, inverse: Boolean): Int
+    fun printQuestion(out: PrintStream, inverse: Boolean, width: Int)
 
     fun getQuestion(inverse: Boolean): String
 
-    fun printAnswer(out: PrintStream, inverse: Boolean): Int
+    fun printAnswer(out: PrintStream, inverse: Boolean, width: Int)
 
     fun getAnswer(inverse: Boolean): String
 
