@@ -85,6 +85,8 @@ class WordFileReader(private val fileName: String) {
         val HISTORY_FILE_VERSION = 2
 
         val SEPARATOR = "|"
+
+        val ALT_SEPARATOR = ";"
     }
 
 }

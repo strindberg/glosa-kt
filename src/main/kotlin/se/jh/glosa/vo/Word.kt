@@ -1,18 +1,15 @@
 package se.jh.glosa.vo
 
 import se.jh.glosa.fw.WordFileReader
+import se.jh.glosa.fw.WordFileReader.Companion.ALT_SEPARATOR
 import java.io.PrintStream
 import java.util.*
 import java.util.regex.Pattern
 
 data class Word(val foreignWord: String, val localWord: String) : IWord {
-    companion object {
-        private val ALT_SEPARATOR = ";"
-    }
+    private val foreignAlternatives = getAnswerAlternatives(foreignWord)
 
-    private val foreignAlternatives: List<String>
-
-    private val localAlternatives: List<String>
+    private val localAlternatives = getAnswerAlternatives(localWord)
 
     private var noOfUsedHist = 0
 
@@ -25,11 +22,6 @@ data class Word(val foreignWord: String, val localWord: String) : IWord {
     private var noOfUsedSessionInverse = 0
 
     private var noOfCorrectInverse = 0
-
-    init {
-        foreignAlternatives = getAnswerAlternatives(foreignWord)
-        localAlternatives = getAnswerAlternatives(localWord)
-    }
 
     override fun printQuestion(out: PrintStream, inverse: Boolean): Int {
         increaseUse(inverse)
