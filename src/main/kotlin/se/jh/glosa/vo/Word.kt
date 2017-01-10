@@ -2,7 +2,6 @@ package se.jh.glosa.vo
 
 import se.jh.glosa.fw.WordFileReader
 import se.jh.glosa.fw.WordFileReader.Companion.ALT_SEPARATOR
-import java.io.PrintStream
 import java.util.*
 import java.util.regex.Pattern
 
@@ -23,18 +22,9 @@ data class Word(val foreignWord: String, val localWord: String) : IWord {
 
     private var noOfCorrectInverse = 0
 
-    override fun printQuestion(out: PrintStream, inverse: Boolean, width: Int) {
-        increaseUse(inverse)
-        out.print("%-${width}s".format(if (!inverse) localWord else foreignWord))
-    }
-
     override fun getQuestion(inverse: Boolean): String {
         increaseUse(inverse)
         return if (!inverse) localWord else foreignWord
-    }
-
-    override fun printAnswer(out: PrintStream, inverse: Boolean, width: Int) {
-        out.print("%-${width}s".format(if (!inverse) foreignWord else localWord))
     }
 
     override fun getAnswer(inverse: Boolean): String = if (!inverse) foreignWord else localWord
