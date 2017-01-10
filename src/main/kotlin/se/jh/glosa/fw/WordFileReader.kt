@@ -54,7 +54,7 @@ class WordFileReader(private val fileName: String) {
                     val words = readLine.split(SEPARATOR)
                     val word = Word(words[0].trim(), words[1].trim())
 
-                    word.initHistory(historyMap?.get(words[0].trim()))
+                    word.initHistory(historyMap?.get(readLine.trim()))
                     returnWords.add(word)
                 }
                 readLine = reader.readLine()
