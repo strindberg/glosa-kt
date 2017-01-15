@@ -3,6 +3,7 @@ package se.jh.glosa.txtui
 import se.jh.glosa.fw.Glosa
 import se.jh.glosa.fw.IWordChooser
 import se.jh.glosa.fw.SuccessiveRandomWordChooser
+import se.jh.glosa.vo.IWord
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -10,8 +11,11 @@ class TextController(private val logic: Glosa, private val inverse: Boolean) {
 
     val ANSI_RESET = "\u001B[0m"
     val ANSI_RED = "\u001B[31m"
+    val ANSI_GREEN = "\u001B[32m"
     val ANSI_CLRSCREEN = "\u001B[H"
     val ANSI_HOME = "\u001B[2J"
+    val ANSI_HIDE_CURSOR = "\u001b[?25l"
+    val ANSI_SHOW_CURSOR = "\u001b[?25h"
 
     val PRINT_WIDTH = 60
 
@@ -20,25 +24,25 @@ class TextController(private val logic: Glosa, private val inverse: Boolean) {
     private val chooser: IWordChooser = SuccessiveRandomWordChooser(logic.words)
 
     fun go(oneShot: Boolean) {
-        clearScreen()
         do {
+            clearScreen()
+            showCursor()
             val currentWord = chooser.nextIWord(inverse)
 
-            val question = currentWord.getQuestion(inverse)
-            printQuestion(question)
+            printQuestion(currentWord.getQuestion(inverse))
 
             val answer = reader.readLine()
             if (answer == "xxx") {
                 logic.quit(true)
             } else {
-                clearScreen()
-                printQuestion(question)
-                println(answer)
-                print("%-${PRINT_WIDTH}s".format(currentWord.getAnswer(inverse)))
-                if (!currentWord.isCorrect(answer, inverse)) {
-                    print("${ANSI_RED}INCORRECT!${ANSI_RESET}")
+                printAnswer(currentWord)
+                if (currentWord.isCorrect(answer, inverse)) {
+                    printFeedback("CORRECT!", ANSI_GREEN)
+                } else {
+                    printFeedback("INCORRECT!", ANSI_RED)
                 }
-                println("\n")
+                hideCursor()
+                reader.readLine()
             }
         } while (!oneShot)
         logic.quit(true)
@@ -51,6 +55,22 @@ class TextController(private val logic: Glosa, private val inverse: Boolean) {
     private fun printQuestion(question: String) {
         print("%-${PRINT_WIDTH}s".format(question))
         println(chooser.noToChooseAmong())
+    }
+
+    private fun printAnswer(currentWord: IWord) {
+        print("%-${PRINT_WIDTH}s".format(currentWord.getAnswer(inverse)))
+    }
+
+    private fun printFeedback(string: String, color: String) {
+        println("${color}${string}${ANSI_RESET}")
+    }
+
+    private fun hideCursor() {
+        print(ANSI_HIDE_CURSOR)
+    }
+
+    private fun showCursor() {
+        print(ANSI_SHOW_CURSOR)
     }
 
 }

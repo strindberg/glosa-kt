@@ -16,5 +16,4 @@ interface IWord {
     fun getNoOfCorrect(inverse: Boolean): Int
 
     fun initHistory(history: List<String>?)
-
 }
