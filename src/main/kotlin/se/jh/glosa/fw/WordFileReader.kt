@@ -5,9 +5,6 @@ import se.jh.glosa.vo.Word
 import java.io.*
 import java.util.*
 
-// TODO: sök efter snyggare hantering av null när history läses in
-// TODO: regexp som säger att separator plus whitespace ska användas
-
 class WordFileReader(private val fileName: String) {
 
     val words: List<IWord>
@@ -31,18 +28,17 @@ class WordFileReader(private val fileName: String) {
                 var inLine = historyIn.readLine()
                 while (inLine != null) {
                     val lineParts = inLine.split(HISTORY_SEPARATOR).toTypedArray()
-                    historyMap.put(lineParts[0].trim(), lineParts.slice(1..(lineParts.size - 1)))
+                    historyMap.put(lineParts[0].trim(), lineParts.slice(1.until(lineParts.size)))
                     inLine = historyIn.readLine()
                 }
-                return historyMap
             }
         }
         return historyMap
     }
 
     private fun readWords(historyMap: Map<String, List<String>>): List<IWord> {
+        val returnWords = ArrayList<IWord>()
         BufferedReader(FileReader(fileName)).use { reader ->
-            val returnWords = ArrayList<IWord>()
             var readLine = reader.readLine()
             var lineCount = 1
             while (readLine != null) {
@@ -60,16 +56,14 @@ class WordFileReader(private val fileName: String) {
                 readLine = reader.readLine()
                 lineCount++
             }
-            return returnWords
         }
+        return returnWords
     }
 
     fun saveHistory(words: List<IWord>) {
         BufferedWriter(FileWriter(historyFileName())).use { historyWriter ->
-            historyWriter.write(COMMENT_CHAR + HISTORY_FILE_VERSION + " \n")
-            for (word in words) {
-                historyWriter.write(word.provideHistoryLine())
-            }
+            historyWriter.write("${COMMENT_CHAR}${HISTORY_FILE_VERSION} \n")
+            words.forEach { historyWriter.write(it.provideHistoryLine()) }
         }
     }
 

@@ -2,13 +2,11 @@ package se.jh.glosa.vo
 
 import se.jh.glosa.fw.WordFileReader
 import se.jh.glosa.fw.WordFileReader.Companion.ALT_SEPARATOR
-import java.util.*
-import java.util.regex.Pattern
 
 data class Word(val foreignWord: String, val localWord: String) : IWord {
-    private val foreignAlternatives = getAnswerAlternatives(foreignWord)
+    val foreignAlternatives = getAnswerAlternatives(foreignWord)
 
-    private val localAlternatives = getAnswerAlternatives(localWord)
+    val localAlternatives = getAnswerAlternatives(localWord)
 
     private var noOfUsedHist = 0
 
@@ -62,31 +60,27 @@ data class Word(val foreignWord: String, val localWord: String) : IWord {
 
     override fun getNoOfUsedSession(inverse: Boolean) = if (!inverse) noOfUsedSession else noOfUsedSessionInverse
 
-    private fun getAnswerAlternatives(answer: String): List<String> {
-        val returnList = ArrayList<String>()
-        returnList.add(answer)
+    private fun getAnswerAlternatives(answer: String): Set<String> {
+        val returnSet = mutableSetOf(answer.trim())
+
         // Remove everything within parentheses (and the parentheses themselves)
         val cleanAnswer = answer.replace("\\(.*\\)".toRegex(), "")
-        returnList.add(cleanAnswer)
+        returnSet.add(cleanAnswer.trim())
+
         // Split on the ";", these constitute independent answers
-        val alternatives = cleanAnswer.split(Pattern.quote(ALT_SEPARATOR).toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        for (i in alternatives.indices) {
-            val alternative = alternatives[i]
+        for (alternative in cleanAnswer.split(ALT_SEPARATOR)) {
             if (alternative.contains("[")) {
-                // TODO: check this logic. Simplify regexps?
                 // Remove brackets (but not what's inside the brackets)
-                val optional = alternative.replace("\\[".toRegex(), "").replace("\\]".toRegex(), "")
-                val p = Pattern.compile("\\[.*\\]")
-                val m = p.matcher(alternative)
+                val optional = alternative.replace("[", "").replace("]", "")
                 // Remove everything within brackets, as well as the brackets
-                val mandatory = m.replaceAll("")
-                returnList.add(mandatory.trim())
-                returnList.add(optional.trim())
+                val mandatory = alternative.replace("\\[.*\\]".toRegex(), "")
+                returnSet.add(mandatory.trim())
+                returnSet.add(optional.trim())
             } else {
-                returnList.add(alternative.trim())
+                returnSet.add(alternative.trim())
             }
         }
-        return returnList
+        return returnSet
     }
 
     private fun increaseUse(inverse: Boolean) {
