@@ -1,11 +1,16 @@
 package se.jh.glosa.txtui
 
+import org.jline.reader.LineReader.EMACS
+import org.jline.reader.LineReaderBuilder
+import org.jline.reader.impl.LineReaderImpl
+import org.jline.terminal.TerminalBuilder
 import se.jh.glosa.fw.Glosa
 import se.jh.glosa.fw.IWordChooser
 import se.jh.glosa.fw.SuccessiveRandomWordChooser
 import se.jh.glosa.vo.IWord
-import java.io.BufferedReader
-import java.io.InputStreamReader
+
+// TODO: kunna starta utan specialpath
+// TODO: snyggare sätt att avsluta
 
 class TextController(private val logic: Glosa, private val inverse: Boolean) {
 
@@ -19,17 +24,21 @@ class TextController(private val logic: Glosa, private val inverse: Boolean) {
 
     val PRINT_WIDTH = 60
 
-    private val reader = BufferedReader(InputStreamReader(System.`in`))
-
     private val chooser: IWordChooser = SuccessiveRandomWordChooser(logic.words)
+
+    private val reader = LineReaderBuilder.builder().terminal(TerminalBuilder.terminal()).build() as LineReaderImpl
+
+    init {
+        reader.setKeyMap(EMACS)
+    }
 
     fun go(oneShot: Boolean) {
         do {
-            clearScreen()
-            showCursor()
             val currentWord = chooser.nextIWord(inverse)
 
-            printQuestion(currentWord.getQuestion(inverse))
+            clearScreen()
+            showCursor()
+            printlnQuestion(currentWord.getQuestion(inverse))
 
             val answer = reader.readLine()
             if (answer == "xxx") {
@@ -37,9 +46,9 @@ class TextController(private val logic: Glosa, private val inverse: Boolean) {
             } else {
                 printAnswer(currentWord)
                 if (currentWord.isCorrect(answer, inverse)) {
-                    printFeedback("CORRECT!", ANSI_GREEN)
+                    printlnFeedback("CORRECT!", ANSI_GREEN)
                 } else {
-                    printFeedback("INCORRECT!", ANSI_RED)
+                    printlnFeedback("INCORRECT!", ANSI_RED)
                 }
                 hideCursor()
                 reader.readLine()
@@ -49,10 +58,10 @@ class TextController(private val logic: Glosa, private val inverse: Boolean) {
     }
 
     private fun clearScreen() {
-        println("${ANSI_CLRSCREEN}${ANSI_HOME}")
+        print("${ANSI_CLRSCREEN}${ANSI_HOME}")
     }
 
-    private fun printQuestion(question: String) {
+    private fun printlnQuestion(question: String) {
         print("%-${PRINT_WIDTH}s".format(question))
         println(chooser.noToChooseAmong())
     }
@@ -61,7 +70,7 @@ class TextController(private val logic: Glosa, private val inverse: Boolean) {
         print("%-${PRINT_WIDTH}s".format(currentWord.getAnswer(inverse)))
     }
 
-    private fun printFeedback(string: String, color: String) {
+    private fun printlnFeedback(string: String, color: String) {
         println("${color}${string}${ANSI_RESET}")
     }
 
