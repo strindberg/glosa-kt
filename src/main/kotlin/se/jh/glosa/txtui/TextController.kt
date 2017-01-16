@@ -2,7 +2,9 @@ package se.jh.glosa.txtui
 
 import org.jline.reader.LineReader.EMACS
 import org.jline.reader.LineReaderBuilder
+import org.jline.reader.UserInterruptException
 import org.jline.reader.impl.LineReaderImpl
+import org.jline.terminal.Terminal
 import org.jline.terminal.TerminalBuilder
 import se.jh.glosa.fw.Glosa
 import se.jh.glosa.fw.IWordChooser
@@ -10,14 +12,13 @@ import se.jh.glosa.fw.SuccessiveRandomWordChooser
 import se.jh.glosa.vo.IWord
 
 // TODO: kunna starta utan specialpath
-// TODO: snyggare sätt att avsluta
 
 class TextController(private val logic: Glosa, private val inverse: Boolean) {
 
     val ANSI_RESET = "\u001B[0m"
     val ANSI_RED = "\u001B[31m"
     val ANSI_GREEN = "\u001B[32m"
-    val ANSI_CLRSCREEN = "\u001B[H"
+    val ANSI_CLRSCRN = "\u001B[H"
     val ANSI_HOME = "\u001B[2J"
     val ANSI_HIDE_CURSOR = "\u001b[?25l"
     val ANSI_SHOW_CURSOR = "\u001b[?25h"
@@ -26,7 +27,9 @@ class TextController(private val logic: Glosa, private val inverse: Boolean) {
 
     private val chooser: IWordChooser = SuccessiveRandomWordChooser(logic.words)
 
-    private val reader = LineReaderBuilder.builder().terminal(TerminalBuilder.terminal()).build() as LineReaderImpl
+    private val terminal = TerminalBuilder.builder().nativeSignals(true).signalHandler(Terminal.SignalHandler.SIG_IGN).build()
+
+    private val reader = LineReaderBuilder.builder().terminal(terminal).build() as LineReaderImpl
 
     init {
         reader.setKeyMap(EMACS)
@@ -40,25 +43,31 @@ class TextController(private val logic: Glosa, private val inverse: Boolean) {
             showCursor()
             printlnQuestion(currentWord.getQuestion(inverse))
 
-            val answer = reader.readLine()
-            if (answer == "xxx") {
-                logic.quit(true)
-            } else {
+            try {
+                val answer = reader.readLine()
                 printAnswer(currentWord)
                 if (currentWord.isCorrect(answer, inverse)) {
                     printlnFeedback("CORRECT!", ANSI_GREEN)
                 } else {
                     printlnFeedback("INCORRECT!", ANSI_RED)
                 }
-                hideCursor()
-                reader.readLine()
+            } catch (e: UserInterruptException) {
+                quit()
             }
+
+            hideCursor()
+            reader.readLine()
         } while (!oneShot)
         logic.quit(true)
     }
 
+    private fun quit() {
+        clearScreen()
+        logic.quit(true)
+    }
+
     private fun clearScreen() {
-        print("${ANSI_CLRSCREEN}${ANSI_HOME}")
+        print("${ANSI_CLRSCRN}${ANSI_HOME}")
     }
 
     private fun printlnQuestion(question: String) {
