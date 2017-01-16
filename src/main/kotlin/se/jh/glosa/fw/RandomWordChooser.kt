@@ -1,17 +1,17 @@
 package se.jh.glosa.fw
 
-import se.jh.glosa.vo.IWord
+import se.jh.glosa.vo.Word
 import java.util.*
 
-class SuccessiveRandomWordChooser(private val words: List<IWord>) : IWordChooser {
+class RandomWordChooser(private val words: List<Word>) : WordChooser {
 
     private val random = Random()
 
-    private var previousWord: IWord? = null
+    private var previousWord: Word? = null
 
     private var noToChooseAmong: Int = 0
 
-    override fun nextIWord(inverse: Boolean): IWord {
+    override fun nextIWord(inverse: Boolean): Word {
         //Choose the word(s) which have been given correctly the least number of times
         val correctWords = words.filter { it.getNoOfCorrect(inverse) ==
                 words.minBy { it.getNoOfCorrect(inverse) }?.getNoOfCorrect(inverse) }

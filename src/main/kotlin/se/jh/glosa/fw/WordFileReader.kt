@@ -1,13 +1,21 @@
 package se.jh.glosa.fw
 
-import se.jh.glosa.vo.IWord
 import se.jh.glosa.vo.Word
+import se.jh.glosa.vo.DefaultWord
 import java.io.*
 import java.util.*
 
+const val WORD_FILE_SUFFIX = ".txt"
+const val HISTORY_FILE_SUFFIX = ".his"
+const val HISTORY_SEPARATOR = "^"
+const val COMMENT_CHAR = "#"
+const val HISTORY_FILE_VERSION = 2
+const val SEPARATOR = "|"
+const val ALT_SEPARATOR = ";"
+
 class WordFileReader(private val fileName: String) {
 
-    val words: List<IWord>
+    val words: List<Word>
 
     init {
         if (!fileName.endsWith(WORD_FILE_SUFFIX)) {
@@ -36,8 +44,8 @@ class WordFileReader(private val fileName: String) {
         return historyMap
     }
 
-    private fun readWords(historyMap: Map<String, List<String>>): List<IWord> {
-        val returnWords = ArrayList<IWord>()
+    private fun readWords(historyMap: Map<String, List<String>>): List<Word> {
+        val returnWords = ArrayList<Word>()
         BufferedReader(FileReader(fileName)).use { reader ->
             var readLine = reader.readLine()
             var lineCount = 1
@@ -48,7 +56,7 @@ class WordFileReader(private val fileName: String) {
                     }
 
                     val words = readLine.split(SEPARATOR)
-                    val word = Word(words[0].trim(), words[1].trim())
+                    val word = DefaultWord(words[0].trim(), words[1].trim())
 
                     word.initHistory(historyMap.get(readLine.trim()))
                     returnWords.add(word)
@@ -60,27 +68,11 @@ class WordFileReader(private val fileName: String) {
         return returnWords
     }
 
-    fun saveHistory(words: List<IWord>) {
+    fun saveHistory(words: List<Word>) {
         BufferedWriter(FileWriter(historyFileName())).use { historyWriter ->
             historyWriter.write("${COMMENT_CHAR}${HISTORY_FILE_VERSION} \n")
             words.forEach { historyWriter.write(it.provideHistoryLine()) }
         }
-    }
-
-    companion object {
-        val WORD_FILE_SUFFIX = ".txt"
-
-        val HISTORY_FILE_SUFFIX = ".his"
-
-        val HISTORY_SEPARATOR = "^"
-
-        val COMMENT_CHAR = "#"
-
-        val HISTORY_FILE_VERSION = 2
-
-        val SEPARATOR = "|"
-
-        val ALT_SEPARATOR = ";"
     }
 
 }

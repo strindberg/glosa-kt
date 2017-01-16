@@ -7,6 +7,17 @@ repositories {
     mavenCentral()
 }
 
+startScripts {
+    doLast {
+        def originalScript = unixScript.text
+        unixScript.text = unixScript.text.replaceAll('exec \\"\\$JAVACMD\\" \\"\\$@\\"',
+                'PATH=/usr/local/bin:/usr/bin:/bin exec \\"\\$JAVACMD\\" \\"\\$@\\"')
+        if (originalScript.equals(unixScript.text)) {
+            throw new RuntimeException("No replacement seems to have been made to the script.")
+        }
+    }
+}
+
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "org.jline:jline:3.1.2"
