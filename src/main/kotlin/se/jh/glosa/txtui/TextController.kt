@@ -19,7 +19,7 @@ const val ANSI_HOME = "\u001B[2J"
 const val ANSI_HIDE_CURSOR = "\u001b[?25l"
 const val ANSI_SHOW_CURSOR = "\u001b[?25h"
 
-const val PRINT_WIDTH = 60
+const val PRINT_WIDTH = 70
 
 class TextController(private val logic: Glosa, private val inverse: Boolean) {
 
