@@ -35,8 +35,8 @@ class WordFileReader(private val fileName: String) {
                 historyIn.readLine() // History version line
                 var inLine = historyIn.readLine()
                 while (inLine != null) {
-                    val lineParts = inLine.split(HISTORY_SEPARATOR).toTypedArray()
-                    historyMap.put(lineParts[0].trim(), lineParts.slice(1.until(lineParts.size)))
+                    val lineParts = inLine.split(HISTORY_SEPARATOR)
+                    historyMap.put(lineParts[0].trim(), lineParts.takeLast(lineParts.size - 1))
                     inLine = historyIn.readLine()
                 }
             }
