@@ -39,8 +39,8 @@ class TextController(private val logic: Glosa, private val inverse: Boolean) {
                 val currentWord = chooser.nextIWord(inverse)
 
                 clearScreen()
-                showCursor()
                 printlnQuestion(currentWord.getQuestion(inverse))
+                showCursor()
 
                 val answer = reader.readLine()
                 printAnswer(currentWord)
