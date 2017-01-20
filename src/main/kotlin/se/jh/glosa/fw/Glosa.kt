@@ -16,6 +16,10 @@ class Glosa(fileName: String) {
         System.exit(0)
     }
 
+    fun save() {
+        fileReader.saveHistory(words)
+    }
+
 }
 
 fun main(args: Array<String>) {

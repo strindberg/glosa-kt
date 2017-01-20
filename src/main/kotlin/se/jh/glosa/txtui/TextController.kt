@@ -51,6 +51,7 @@ class TextController(private val logic: Glosa, private val inverse: Boolean) {
                 }
 
                 hideCursor()
+                logic.save()
                 reader.readLine()
             } catch (e: UserInterruptException) {
                 quit()
@@ -61,7 +62,7 @@ class TextController(private val logic: Glosa, private val inverse: Boolean) {
     private fun quit() {
         clearScreen()
         showCursor()
-        logic.quit(true)
+        logic.quit(false)
     }
 
     private fun clearScreen() {
