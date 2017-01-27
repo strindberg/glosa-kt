@@ -1,8 +1,11 @@
 package se.jh.glosa.fw
 
-import se.jh.glosa.vo.Word
 import se.jh.glosa.vo.DefaultWord
-import java.io.*
+import se.jh.glosa.vo.Word
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileWriter
+import java.io.IOException
 import java.util.*
 
 const val WORD_FILE_SUFFIX = ".txt"
@@ -31,13 +34,10 @@ class WordFileReader(private val fileName: String) {
         val historyMap: MutableMap<String, List<String>> = HashMap()
         val historyFile = File(historyFileName)
         if (historyFile.exists()) {
-            BufferedReader(FileReader(historyFile)).use { historyIn ->
-                historyIn.readLine() // History version line
-                var inLine = historyIn.readLine()
-                while (inLine != null) {
-                    val lineParts = inLine.split(HISTORY_SEPARATOR)
+            historyFile.forEachLine { line ->
+                if (!line.startsWith(COMMENT_CHAR) && line.isNotEmpty()) {
+                    val lineParts = line.split(HISTORY_SEPARATOR)
                     historyMap.put(lineParts[0].trim(), lineParts.takeLast(lineParts.size - 1))
-                    inLine = historyIn.readLine()
                 }
             }
         }
@@ -46,23 +46,17 @@ class WordFileReader(private val fileName: String) {
 
     private fun readWords(historyMap: Map<String, List<String>>): List<Word> {
         val returnWords = ArrayList<Word>()
-        BufferedReader(FileReader(fileName)).use { reader ->
-            var readLine = reader.readLine()
-            var lineCount = 1
-            while (readLine != null) {
-                if (!readLine.startsWith(COMMENT_CHAR) && readLine.isNotEmpty()) {
-                    if (!readLine.contains(SEPARATOR)) {
-                        throw IOException("Wrong format in file, line $lineCount: $readLine")
-                    }
-
-                    val words = readLine.split(SEPARATOR)
-                    val word = DefaultWord(words[0].trim(), words[1].trim())
-
-                    word.initHistory(historyMap.get(readLine.trim()))
-                    returnWords.add(word)
+        File(fileName).forEachLine { line ->
+            if (!line.startsWith(COMMENT_CHAR) && line.isNotEmpty()) {
+                if (!line.contains(SEPARATOR)) {
+                    throw IOException("Wrong format in file, line: $line")
                 }
-                readLine = reader.readLine()
-                lineCount++
+
+                val words = line.split(SEPARATOR)
+                val word = DefaultWord(words[0].trim(), words[1].trim())
+
+                word.initHistory(historyMap.get(line.trim()))
+                returnWords.add(word)
             }
         }
         return returnWords
